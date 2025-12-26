@@ -55,3 +55,9 @@
   -fx-scale-x: 1.05;
   -fx-scale-y: 1.05;
 }
+
+#highscore-celebration {
+  -fx-text-fill: gold;
+  -fx-font-size: 32px;
+  -fx-font-weight: bold;
+}
