@@ -9,7 +9,7 @@ public class PlayerCar extends Car {
     public PlayerCar(double x, double y, Image image) {
         super(x, y, 0.0, image);
     }
-    
+
     @Override
     public void update() {
         x += speedX;
