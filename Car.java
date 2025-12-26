@@ -1,23 +1,79 @@
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
-public class Car {
-    protected int x;
-    protected int y;
-    protected int speed;
-    protected Image sprite;
+public abstract class Car {
+    protected double x;
+    protected double y;
+    protected double speed;
+    protected Image image;
+    protected double width;
+    protected double height;
 
-    public Car(int x, int y, int speed, Image sprite) {
+    public Car(double x, double y, double speed, Image image) {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        this.sprite = sprite;
+        this.image = image;
+        this.width = image.getWidth();
+        this.height = image.getHeight();
     }
 
-    public void move() {
+    public abstract void update();
+
+    public void draw(GraphicsContext gc) {
+        if (image != null) {
+            gc.drawImage(image, x, y);
+        }
     }
 
-    public void draw(Graphics g) {
-
+    public double getX() {
+        return x;
     }
 
+    public double getY() {
+        return y;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getRight() {
+        return x + width;
+    }
+
+    public double getBottom() {
+        return y + height;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public boolean isOffScreen(double screenWidth) {
+        return x + width < 0 || x > screenWidth || y + height < 0 || y > screenWidth;
+    }
+
+    public boolean collidesWith(Car other) {
+        return x < other.x + other.width &&
+                x + width > other.x &&
+                y < other.y + other.height &&
+                y + height > other.y;
+    }
 }
