@@ -13,8 +13,8 @@ import java.util.Random;
 
 public class Game extends Pane {
 
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 500;
+    private static final int WIDTH = 600;
+    private static final int HEIGHT = 700;
 
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
