@@ -25,7 +25,7 @@ public class Game extends Pane {
 
     private static final String HIGHSCORE_FILE = "highscore.txt";
     private int highScore = 0;
-    
+
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -34,9 +34,10 @@ public class Game extends Pane {
     private final Random random = new Random();
 
     private long lastSpawnTime = 0;
-    private static long SPAWN_COOLDOWN = 1_500_000_000L; 
+    private static long SPAWN_COOLDOWN = 1_500_000_000L;
+    private static final double SAFE_SPAWN_Y = 220;
     private double currentEnemySpeed = 3.0;
-    private static final double SPEED_INCREMENT = 0.4;
+    private static final double SPEED_INCREMENT = 0.2;
 
     private boolean gameOver = false;
     private int score = 0;
@@ -51,9 +52,13 @@ public class Game extends Pane {
     private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
-private static final double[] LANES = {
-    190, 240, 290, 340, 390, 440
-};
+    private static final double[] LANES = {
+            190, 240, 290, 340, 390, 440
+    };
+
+    private double controlminSpeed = 3; // EASY
+    private double controlMidSpeed = 4; // Medium
+    private double controlMaxSpeed = 5; // Hard
 
     public Game() {
         getChildren().add(canvas);
@@ -63,15 +68,23 @@ private static final double[] LANES = {
     /* ---------- CONTROLS ---------- */
     public void bindControls(Scene scene) {
 
+        double controlSpeed;
+        if (score > 50)
+            controlSpeed = controlMaxSpeed;
+        else if (score > 15)
+            controlSpeed = controlMidSpeed;
+        else
+            controlSpeed = controlminSpeed;
+
         scene.setOnKeyPressed(e -> {
             if (gameOver || showBoom)
                 return;
 
             switch (e.getCode()) {
-                case LEFT -> player.speedX = -3;
-                case RIGHT -> player.speedX = 3;
-                case UP -> player.speedY = -3;
-                case DOWN -> player.speedY = 3;
+                case LEFT -> player.speedX = -controlSpeed;
+                case RIGHT -> player.speedX = controlSpeed;
+                case UP -> player.speedY = -controlSpeed + 1;
+                case DOWN -> player.speedY = controlSpeed;
             }
         });
 
@@ -85,14 +98,15 @@ private static final double[] LANES = {
 
     /* ---------- GAME LOOP ---------- */
     public void startGame() {
-    // Reset game state
-    gameOver = false;
-    showBoom = false;
-    ROAD_SPEED = 2;   // reset road speed
-    player.speedX = 0;
-    player.speedY = 0;
-    lastSpawnTime = 0;
-    enemies.forEach(e -> e.speed = 2); // reset existing enemies' speed
+        // Reset game state
+        gameOver = false;
+        showBoom = false;
+        ROAD_SPEED = 2; // reset road speed
+        player.speedX = 0;
+        player.speedY = 0;
+        lastSpawnTime = 0;
+        SPAWN_COOLDOWN = 1_500_000_000L;
+        enemies.forEach(e -> e.speed = 2); // reset existing enemies' speed
 
         new AnimationTimer() {
 
@@ -145,27 +159,34 @@ private static final double[] LANES = {
     }
 
     private void spawnEnemies(long now) {
-        if (gameOver || showBoom) return; 
-         if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN) return;
+        if (gameOver || showBoom)
+            return;
+        if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN)
+            return;
 
-            double lane = LANES[random.nextInt(LANES.length)];
+        double lane = LANES[random.nextInt(LANES.length)];
 
-            boolean laneBusy = false;
-            for (RandomCar enemy : enemies) {
+        boolean laneBusy = false;
+        for (RandomCar enemy : enemies) {
 
-                if (Math.abs(enemy.x - lane) < 10 && enemy.y < 200) {
-                    laneBusy = true;
-                    break;
-                }
+            if (Math.abs(enemy.x - lane) < 10 && enemy.y < SAFE_SPAWN_Y) {
+                laneBusy = true;
+                break;
             }
 
-            if (!laneBusy) {
-                String side = random.nextBoolean() ? "car_left" : "car_right";
-                String image = side + (random.nextInt(3) + 1) + ".png";
-
-                enemies.add(new RandomCar(lane, image, currentEnemySpeed));
-                lastSpawnTime = now;
+            if (enemy.y < 120) {
+                laneBusy = true;
+                break;
             }
+        }
+
+        if (!laneBusy) {
+            String side = random.nextBoolean() ? "car_left" : "car_right";
+            String image = side + (random.nextInt(3) + 1) + ".png";
+
+            enemies.add(new RandomCar(lane, image, currentEnemySpeed));
+            lastSpawnTime = now;
+        }
     }
 
     /* ---------- COLLISION ---------- */
