@@ -1,68 +1,153 @@
 package com.autonest;
 
+import javafx.animation.AnimationTimer;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
-// import javax.swing.*;
-// import java.awt.*;
-// import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class Game {
-    private int score;
-    private int highScore;
-    private boolean isGameOver;
-    private PlayerCar player;
-    private List<RandomCar> randomCars;
+public class Game extends Pane {
+
+    private static final int WIDTH = 500;
+    private static final int HEIGHT = 500;
+
+    private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
+    private final GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    private final PlayerCar player = new PlayerCar();
+    private final List<RandomCar> enemies = new ArrayList<>();
+    private final Random random = new Random();
+
+    private boolean gameOver = false;
+    private int score = 0;
+
+    /* ---------- ROAD SCROLLING ---------- */
+    private double roadY1 = 0;
+    private double roadY2 = -HEIGHT;
+    private static final double ROAD_SPEED = 2;
+
+    /* ---------- LANES ---------- */
+    private static final double[] LANES = {130, 185, 250, 300};
 
     public Game() {
-        score = 0;
-        highScore = 0;
-        isGameOver = false;
-        randomCars = new ArrayList<>();
+        getChildren().add(canvas);
     }
 
-    public void start() {
+    /* ---------- CONTROLS ---------- */
+    public void bindControls(Scene scene) {
 
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case LEFT -> player.speedX = -3;
+                case RIGHT -> player.speedX = 3;
+                case UP -> player.speedY = -3;
+                case DOWN -> player.speedY = 3;
+            }
+        });
+
+        scene.setOnKeyReleased(e -> {
+            switch (e.getCode()) {
+                case LEFT, RIGHT -> player.speedX = 0;
+                case UP, DOWN -> player.speedY = 0;
+            }
+        });
     }
 
-    public void update() {
-        if (isGameOver)
-            return;
+    /* ---------- GAME LOOP ---------- */
+    public void startGame() {
+        new AnimationTimer() {
 
-        spawnRandomCar();
-        checkCollision();
-        updateScore();
+            @Override
+            public void handle(long now) {
+                if (gameOver) return;
 
-        for (RandomCar car : randomCars) {
-            car.move();
+                updateRoad();
+                player.update();
+                updateEnemies();
+                spawnEnemies(now);
+                checkCollision();
+                render();
+            }
+
+        }.start();
+    }
+
+    /* ---------- ROAD ---------- */
+    private void updateRoad() {
+        roadY1 += ROAD_SPEED;
+        roadY2 += ROAD_SPEED;
+
+        if (roadY1 >= HEIGHT) roadY1 = -HEIGHT;
+        if (roadY2 >= HEIGHT) roadY2 = -HEIGHT;
+    }
+
+    /* ---------- ENEMIES ---------- */
+    private void updateEnemies() {
+        enemies.forEach(RandomCar::update);
+
+        enemies.removeIf(e -> {
+            if (e.y > HEIGHT + 100) {
+                score++;
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void spawnEnemies(long now) {
+        if (now % 1_000_000_000 < 20_000_000 && enemies.size() < 4) {
+
+            double lane = LANES[random.nextInt(LANES.length)];
+
+            String image =
+                    random.nextBoolean()
+                            ? "car_left" + (random.nextInt(3) + 1) + ".png"
+                            : "car_right" + (random.nextInt(3) + 1) + ".png";
+
+            enemies.add(
+                    new RandomCar(
+                            lane,
+                            image,
+                            2 + random.nextInt(2)
+                    )
+            );
         }
     }
 
-    public void spawnRandomCar() {
-        if (randomCars.size() < 4 && Math.random() < 0.02) {
-
+    /* ---------- COLLISION ---------- */
+    private void checkCollision() {
+        for (RandomCar enemy : enemies) {
+            if (player.collidesWith(enemy)) {
+                gameOver = true;
+            }
         }
     }
 
-    public void checkCollision() {
+    /* ---------- RENDER ---------- */
+    private void render() {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-    }
+        // Road
+        gc.drawImage(Assets.img("road1.png"), 0, roadY1, WIDTH, HEIGHT);
+        gc.drawImage(Assets.img("road2.png"), 0, roadY2, WIDTH, HEIGHT);
 
-    public void updateScore() {
-        for (int i = 0; i < randomCars.size(); i++) {
+        // Cars
+        player.draw(gc);
+        enemies.forEach(e -> e.draw(gc));
 
+        // HUD
+        gc.setFill(Color.WHITE);
+        gc.fillText("Score: " + score, 20, 30);
+
+        if (gameOver) {
+            gc.setFill(Color.RED);
+            gc.fillText("GAME OVER", WIDTH / 2.0 - 40, HEIGHT / 2.0);
         }
     }
-
-    public void endGame() {
-        isGameOver = true;
-
-        String message = "Game Over! Score: " + score;
-        if (score == highScore && score > 0) {
-            message += "\nNew High Score!";
-        }
-
-        System.out.println(message);
-    }
-
 }

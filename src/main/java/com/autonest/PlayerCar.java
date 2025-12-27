@@ -1,28 +1,27 @@
 package com.autonest;
 
-// PlayerCar.java
-import javafx.scene.image.Image;
-
 public class PlayerCar extends Car {
-    private double speedX = 0;
-    private double speedY = 0;
-    private static final double MOVE_SPEED = 4.0;
-    
-    public PlayerCar(double x, double y, Image image) {
-        super(x, y, 0.0, image);
+
+    public double speedX = 0;
+    public double speedY = 0;
+
+    public PlayerCar() {
+        super(
+                230, // start X
+                350, // start Y
+                50, // width
+                90, // height
+                0, // speed (manual)
+                Assets.img("carself.png"));
     }
 
     @Override
     public void update() {
         x += speedX;
         y += speedY;
+
+        // Keep car on road (no grass)
+        x = Math.max(120, Math.min(330, x));
+        y = Math.max(120, Math.min(380, y));
     }
-    
-    public void moveUp() { speedY = -MOVE_SPEED; }
-    public void moveDown() { speedY = MOVE_SPEED; }
-    public void moveRight() { speedX = MOVE_SPEED; }
-    public void moveLeft() { speedX = -MOVE_SPEED; }
-    
-    public void stopVertical() { speedY = 0; }
-    public void stopHorizontal() { speedX = 0; }
 }

@@ -1,20 +1,19 @@
 package com.autonest;
-import java.awt.*;
-import java.util.Random;
-
-// Todo: Java AWT Image sprit?
 
 public class RandomCar extends Car {
 
-    public RandomCar(int x, int y, int speed, Image sprite) {
-        super(x, y, speed, sprite);
+    public RandomCar(double laneX, String imageName, double speed) {
+        super(
+                laneX,
+                -120, // start above screen
+                50,
+                90,
+                speed,
+                Assets.img(imageName));
     }
 
-    public void update(){};
-
-    public void setRandomLane(int[] lanes) {
-        Random rand = new Random();
-        x = lanes[rand.nextInt(lanes.length)];
+    @Override
+    public void update() {
+        y += speed; // move DOWN toward player
     }
-
 }
