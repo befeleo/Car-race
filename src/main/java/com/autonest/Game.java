@@ -27,11 +27,12 @@ public class Game extends Pane {
     private int score = 0;
 private boolean showBoom = false;
 private double boomX, boomY;
-
+private long boomStartTime = 0;
+private final long BOOM_DURATION = 1_000_000_000;
     /* ---------- ROAD SCROLLING ---------- */
     private double roadY1 = 0;
     private double roadY2 = -HEIGHT;
-    private static final double ROAD_SPEED = 2;
+    private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
     private static final double[] LANES = {130, 185, 250, 300};
@@ -62,6 +63,14 @@ private double boomX, boomY;
 
     /* ---------- GAME LOOP ---------- */
     public void startGame() {
+         // Reset game state
+    gameOver = false;
+    showBoom = false;
+    ROAD_SPEED = 2;   // reset road speed
+    player.speedX = 0;
+    player.speedY = 0;
+    enemies.forEach(e -> e.speed = 2); // reset existing enemies' speed
+
         new AnimationTimer() {
 
             @Override
@@ -102,6 +111,7 @@ private double boomX, boomY;
     }
 
     private void spawnEnemies(long now) {
+        if (gameOver || showBoom) return; 
         if (now % 1_000_000_000 < 20_000_000 && enemies.size() < 4) {
 
             double lane = LANES[random.nextInt(LANES.length)];
@@ -124,15 +134,23 @@ private double boomX, boomY;
     /* ---------- COLLISION ---------- */
 private void checkCollision() {
     for (RandomCar enemy : enemies) {
-        if (player.collidesWith(enemy)) {
-            gameOver = true;
-
-            // Store collision point for explosion
-            boomX = player.getCollisionX(enemy) - 25; // adjust half of explosion width
-            boomY = player.getCollisionY(enemy) - 25;
+        if (player.collidesWith(enemy) && !showBoom) {
+            boomX = player.getCollisionX(enemy) - 37; // center explosion
+            boomY = player.getCollisionY(enemy) - 37;
             showBoom = true;
+            boomStartTime = System.nanoTime();
+
+            player.speedX = 0;
+            player.speedY = 0;
+            ROAD_SPEED = 0;
+            enemies.forEach(e -> e.speed = 0);
             break;
         }
+    }
+
+    // After 1 second of showing boom, end game
+    if (showBoom && System.nanoTime() - boomStartTime > BOOM_DURATION) {
+        gameOver = true;
     }
 }
 
@@ -158,10 +176,25 @@ if (showBoom) {
         // HUD
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + score, 20, 30);
-
-        if (gameOver) {
-            gc.setFill(Color.RED);
-            gc.fillText("GAME OVER", WIDTH / 2.0 - 40, HEIGHT / 2.0);
-        }
     }
+
+    public boolean isGameOver(){
+        return gameOver;
+    }
+
+    /* ---------- GETTERS ---------- */
+public PlayerCar getPlayerCar() {
+    return player;
+}
+
+public void showBoom(double x, double y) {
+    boomX = x;
+    boomY = y;
+    showBoom = true;
+}
+
+public int getScore() {
+    return score;
+}
+
 }
