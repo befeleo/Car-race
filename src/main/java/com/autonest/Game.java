@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class Game extends Pane {
 
-    private static final int WIDTH = 600;
+    private static final int WIDTH = 700;
     private static final int HEIGHT = 700;
 
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
@@ -50,6 +50,8 @@ private final long BOOM_DURATION = 1_000_000_000;
     public void bindControls(Scene scene) {
 
         scene.setOnKeyPressed(e -> {
+        if (gameOver || showBoom) return; 
+
             switch (e.getCode()) {
                 case LEFT -> player.speedX = -3;
                 case RIGHT -> player.speedX = 3;
