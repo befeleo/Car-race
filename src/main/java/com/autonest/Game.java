@@ -24,7 +24,8 @@ public class Game extends Pane {
     private static final int HEIGHT = 700;
 
     private static final String HIGHSCORE_FILE = "highscore.txt";
-
+    private int highScore = 0;
+    
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
