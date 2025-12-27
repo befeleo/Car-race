@@ -107,6 +107,7 @@ private final long BOOM_DURATION = 1_000_000_000;
 
     /* ---------- ENEMIES ---------- */
     private void updateEnemies() {
+        if (showBoom || gameOver) return;
         enemies.forEach(RandomCar::update);
 
         enemies.removeIf(e -> {
@@ -125,7 +126,7 @@ private final long BOOM_DURATION = 1_000_000_000;
 
     private void spawnEnemies(long now) {
         if (gameOver || showBoom) return; 
-        if (now - lastSpawnTime >= SPAWN_COOLDOWN && enemies.size() < 4) {
+        if (now % 1_000_000_000 < 20_000_000 && enemies.size() < 4) {
 
             double lane = LANES[random.nextInt(LANES.length)];
 
