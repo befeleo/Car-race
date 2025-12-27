@@ -42,7 +42,7 @@ public class GameLauncher extends Application {
         layout.setPadding(new Insets(50));
         layout.setId("welcome-layout");
 
-        Scene scene = new Scene(layout, 700, 500);
+        Scene scene = new Scene(layout, 700, 700);
         scene.getStylesheets().add(getClass().getResource("/css/welcome.css").toExternalForm());
 
         primaryStage.setTitle("Car Racing Game - Welcome");
@@ -53,7 +53,7 @@ public class GameLauncher extends Application {
     // 🔹 Start Game
     private void startGame() {
         Game Game = new Game();
-        Scene gameScene = new Scene(Game, 500, 500);
+        Scene gameScene = new Scene(Game, 700, 700);
         Game.bindControls(gameScene);
 
         primaryStage.setScene(gameScene);
@@ -109,7 +109,7 @@ public class GameLauncher extends Application {
 
         layout.getChildren().addAll(restartButton, exitButton);
 
-        Scene scene = new Scene(layout, 700, 500);
+        Scene scene = new Scene(layout, 700, 700);
         scene.getStylesheets().add(getClass().getResource("/css/gameover.css").toExternalForm());
 
         primaryStage.setTitle(isHighScore ? "Car Racing Game - NEW HIGH SCORE!" : "Car Racing Game - Game Over");
