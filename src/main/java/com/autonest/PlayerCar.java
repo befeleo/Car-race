@@ -21,7 +21,7 @@ public class PlayerCar extends Car {
         y += speedY;
 
         // Keep car on road (no grass)
-        x = Math.max(120, Math.min(330, x));
-        y = Math.max(120, Math.min(380, y));
+        x = Math.max(120, Math.min(308, x));
+        y = Math.max(20, Math.min(400, y));
     }
 }
