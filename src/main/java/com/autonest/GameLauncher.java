@@ -24,7 +24,7 @@ public class GameLauncher extends Application {
 
     // 🔹 Welcome Screen
     private void showWelcomeScreen() {
-        
+
         Label titleLabel = new Label("Welcome to Car Racing Game");
         titleLabel.setId("welcome-title");
 
@@ -65,7 +65,10 @@ public class GameLauncher extends Application {
         // Detect game over
         new Thread(() -> {
             while (!Game.isGameOver()) {
-                try { Thread.sleep(50); } catch (Exception ignored) {}
+                try {
+                    Thread.sleep(50);
+                } catch (Exception ignored) {
+                }
             }
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1)); // 1 second boom
@@ -76,7 +79,8 @@ public class GameLauncher extends Application {
 
     // 🔹 Game Over Screen
     private void showGameOverScreen(int currentScore) {
-        if (currentScore > highScore) highScore = currentScore;
+        if (currentScore > highScore)
+            highScore = currentScore;
         boolean isHighScore = currentScore == highScore && currentScore > 0;
 
         Label gameOverLabel = new Label("GAME OVER");
@@ -101,7 +105,7 @@ public class GameLauncher extends Application {
 
         Button restartButton = new Button("RESTART");
         restartButton.setId("restart-button");
-        restartButton.setOnAction(e -> showWelcomeScreen());
+        restartButton.setOnAction(e -> startGame());
 
         Button exitButton = new Button("EXIT");
         exitButton.setId("gameover-exit-button");
