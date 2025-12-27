@@ -1,33 +1,28 @@
 package com.autonest;
 
+// PlayerCar.java
 import javafx.scene.image.Image;
 
 public class PlayerCar extends Car {
     private double speedX = 0;
-    private final double MOVE_SPEED = 5.0;
-
+    private double speedY = 0;
+    private static final double MOVE_SPEED = 4.0;
+    
     public PlayerCar(double x, double y, Image image) {
-        super(x, y, 0, image);
+        super(x, y, 0.0, image);
     }
 
+    @Override
     public void update() {
         x += speedX;
-
-        // restrict inside road (assuming road from x=50 to x=450)
-        if (x < 50) x = 50;
-        if (x > 450) x = 450;
+        y += speedY;
     }
-
-    public void moveLeft() { speedX = -MOVE_SPEED; }
+    
+    public void moveUp() { speedY = -MOVE_SPEED; }
+    public void moveDown() { speedY = MOVE_SPEED; }
     public void moveRight() { speedX = MOVE_SPEED; }
+    public void moveLeft() { speedX = -MOVE_SPEED; }
+    
+    public void stopVertical() { speedY = 0; }
     public void stopHorizontal() { speedX = 0; }
-
-    public boolean collidesWith(Car other) {
-        return getRight() > other.getX() &&
-               getX() < other.getRight() &&
-               getBottom() > other.getY() &&
-               getY() < other.getBottom();
-    }
-
-    public void setSprite(Image image) { this.sprite = image; }
 }
