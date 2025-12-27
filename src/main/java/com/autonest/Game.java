@@ -56,10 +56,10 @@ public class Game extends Pane {
             190, 240, 290, 340, 390, 440
     };
 
-    private double controlminSpeed = 3; // EASY
-    private double controlMidSpeed = 4; // Medium
-    private double controlMaxSpeed = 5; // Hard
-    private double controlExtraSpeed = 6; // Too Hard
+    private double controlminSpeed = 4; // EASY
+    private double controlMidSpeed = 5; // Medium
+    private double controlMaxSpeed = 6; // Hard
+    private double controlExtraSpeed = 8; // Too Hard
 
     public Game() {
         getChildren().add(canvas);
@@ -190,8 +190,7 @@ public class Game extends Pane {
         }
 
         if (!laneBusy) {
-            String side = random.nextBoolean() ? "car_left" : "car_right";
-            String image = side + (random.nextInt(3) + 1) + ".png";
+            String image = "car_" + (random.nextInt(6) + 1) + ".png";
 
             enemies.add(new RandomCar(lane, image, currentEnemySpeed));
             lastSpawnTime = now;
