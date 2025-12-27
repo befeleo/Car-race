@@ -13,5 +13,6 @@ public class RandomCar extends Car {
             this.speed = 2.0;
 
         this.y += this.speed;
+         x = Math.max(170, Math.min(450, x));
     }
 }

@@ -40,7 +40,7 @@ private final long BOOM_DURATION = 1_000_000_000;
     private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
-    private static final double[] LANES = { 130, 185, 250, 300 };
+private static final double[] LANES = {180, 220, 260, 300, 340, 380};
 
     public Game() {
         getChildren().add(canvas);
