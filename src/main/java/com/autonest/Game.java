@@ -24,23 +24,26 @@ public class Game extends Pane {
     private final Random random = new Random();
 
     private long lastSpawnTime = 0;
-    private static final long SPAWN_COOLDOWN = 1_500_000_000L; 
+    private static long SPAWN_COOLDOWN = 1_500_000_000L; 
     private double currentEnemySpeed = 3.0;
     private static final double SPEED_INCREMENT = 0.4; 
 
     private boolean gameOver = false;
     private int score = 0;
-private boolean showBoom = false;
-private double boomX, boomY;
-private long boomStartTime = 0;
-private final long BOOM_DURATION = 1_000_000_000;
+    private boolean showBoom = false;
+    private double boomX, boomY;
+    private long boomStartTime = 0;
+    private final long BOOM_DURATION = 1_000_000_000;
+
     /* ---------- ROAD SCROLLING ---------- */
     private double roadY1 = 0;
     private double roadY2 = -HEIGHT;
     private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
-private static final double[] LANES = {180, 220, 260, 300, 340, 380};
+private static final double[] LANES = {
+    190, 240, 290, 340, 390, 440
+};
 
     public Game() {
         getChildren().add(canvas);
@@ -70,12 +73,13 @@ private static final double[] LANES = {180, 220, 260, 300, 340, 380};
 
     /* ---------- GAME LOOP ---------- */
     public void startGame() {
-         // Reset game state
+    // Reset game state
     gameOver = false;
     showBoom = false;
     ROAD_SPEED = 2;   // reset road speed
     player.speedX = 0;
     player.speedY = 0;
+    lastSpawnTime = 0;
     enemies.forEach(e -> e.speed = 2); // reset existing enemies' speed
 
         new AnimationTimer() {
@@ -118,6 +122,7 @@ private static final double[] LANES = {180, 220, 260, 300, 340, 380};
 
                 if (currentEnemySpeed < 10.0) {
                     currentEnemySpeed += SPEED_INCREMENT;
+                    SPAWN_COOLDOWN = Math.max(400_000_000L, SPAWN_COOLDOWN - 100_000_000L);
                 }
 
                 return true;
@@ -128,7 +133,7 @@ private static final double[] LANES = {180, 220, 260, 300, 340, 380};
 
     private void spawnEnemies(long now) {
         if (gameOver || showBoom) return; 
-        if (now % 1_000_000_000 < 20_000_000 && enemies.size() < 4) {
+         if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN) return;
 
             double lane = LANES[random.nextInt(LANES.length)];
 
@@ -148,7 +153,6 @@ private static final double[] LANES = {180, 220, 260, 300, 340, 380};
                 enemies.add(new RandomCar(lane, image, currentEnemySpeed));
                 lastSpawnTime = now;
             }
-        }
     }
 
     /* ---------- COLLISION ---------- */
