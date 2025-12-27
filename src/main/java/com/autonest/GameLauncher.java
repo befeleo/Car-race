@@ -14,7 +14,6 @@ import javafx.util.Duration;
 public class GameLauncher extends Application {
 
     private Stage primaryStage;
-    private int highScore = 0;
 
     @Override
     public void start(Stage primaryStage) {
@@ -72,13 +71,13 @@ public class GameLauncher extends Application {
             }
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1)); // 1 second boom
-            pause.setOnFinished(ev -> showGameOverScreen(Game.getScore()));
+            pause.setOnFinished(ev -> showGameOverScreen(Game.getScore(), Game.getHighScore()));
             pause.play();
         }).start();
     }
 
     // 🔹 Game Over Screen
-    private void showGameOverScreen(int currentScore) {
+    private void showGameOverScreen(int currentScore, int highScore) {
         if (currentScore > highScore)
             highScore = currentScore;
         boolean isHighScore = currentScore == highScore && currentScore > 0;

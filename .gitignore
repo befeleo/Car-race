@@ -33,3 +33,6 @@ lib/
 
 # Test results
 surefire-reports/
+
+# Texts
+*.txt
