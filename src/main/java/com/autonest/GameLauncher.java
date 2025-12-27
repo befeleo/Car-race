@@ -1,5 +1,4 @@
 package com.autonest;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -96,8 +95,8 @@ public class GameLauncher extends Application {
         primaryStage.setTitle(isHighScore ? "Car Racing Game - NEW HIGH SCORE!" : "Car Racing Game - Game Over");
         primaryStage.setScene(scene);
     }
-
     public static void main(String[] args) {
         launch(args);
     }
+}
 }
