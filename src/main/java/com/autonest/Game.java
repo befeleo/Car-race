@@ -26,7 +26,6 @@ public class Game extends Pane {
     private static final String HIGHSCORE_FILE = "highscore.txt";
     private int highScore = 0;
 
-
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -37,7 +36,7 @@ public class Game extends Pane {
     private long lastSpawnTime = 0;
     private static long SPAWN_COOLDOWN = 1_500_000_000L;
     private static final double SAFE_SPAWN_Y = 220;
-    private double currentEnemySpeed = 3.0;
+    private double currentEnemySpeed = 5.0;
     private static final double SPEED_INCREMENT = 0.2;
 
     private boolean gameOver = false;
@@ -50,7 +49,7 @@ public class Game extends Pane {
     /* ---------- ROAD SCROLLING ---------- */
     private final int TOTAL_ROADS = 5;
     private double[] roadY = new double[TOTAL_ROADS];
-    private static double ROAD_SPEED = 2;
+    private static double ROAD_SPEED = 3;
 
     /* ---------- LANES ---------- */
     private static final double[] LANES = {
@@ -60,6 +59,7 @@ public class Game extends Pane {
     private double controlminSpeed = 3; // EASY
     private double controlMidSpeed = 4; // Medium
     private double controlMaxSpeed = 5; // Hard
+    private double controlExtraSpeed = 6; // Too Hard
 
     public Game() {
         getChildren().add(canvas);
@@ -74,12 +74,13 @@ public class Game extends Pane {
     public void bindControls(Scene scene) {
 
         double controlSpeed;
-        if (score > 50)
+        if (score > 35)
+            controlSpeed = controlExtraSpeed;
+        else if (score > 25)
             controlSpeed = controlMaxSpeed;
         else if (score > 15)
             controlSpeed = controlMidSpeed;
-        else
-            controlSpeed = controlminSpeed;
+        else controlSpeed = controlminSpeed;
 
         scene.setOnKeyPressed(e -> {
             if (gameOver || showBoom)
@@ -169,24 +170,19 @@ public class Game extends Pane {
             return;
         if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN)
             return;
-        if (gameOver || showBoom)
-            return;
-        if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN)
-            return;
 
-        double lane = LANES[random.nextInt(LANES.length)];
         double lane = LANES[random.nextInt(LANES.length)];
 
         boolean laneBusy = false;
         for (RandomCar enemy : enemies) {
-        boolean laneBusy = false;
-        for (RandomCar enemy : enemies) {
 
+            // 1️⃣ same lane too close
             if (Math.abs(enemy.x - lane) < 10 && enemy.y < SAFE_SPAWN_Y) {
                 laneBusy = true;
                 break;
             }
 
+            // 2️⃣ ANY lane too close vertically (fairness rule)
             if (enemy.y < 120) {
                 laneBusy = true;
                 break;
@@ -196,16 +192,11 @@ public class Game extends Pane {
         if (!laneBusy) {
             String side = random.nextBoolean() ? "car_left" : "car_right";
             String image = side + (random.nextInt(3) + 1) + ".png";
-        if (!laneBusy) {
-            String side = random.nextBoolean() ? "car_left" : "car_right";
-            String image = side + (random.nextInt(3) + 1) + ".png";
 
             enemies.add(new RandomCar(lane, image, currentEnemySpeed));
             lastSpawnTime = now;
         }
-            enemies.add(new RandomCar(lane, image, currentEnemySpeed));
-            lastSpawnTime = now;
-        }
+
     }
 
     /* ---------- COLLISION ---------- */
@@ -303,4 +294,7 @@ public class Game extends Pane {
         return score;
     }
 
+    public int getHighScore() {
+        return highScore;
+    }
 }
