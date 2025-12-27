@@ -26,6 +26,7 @@ public class Game extends Pane {
     private static final String HIGHSCORE_FILE = "highscore.txt";
     private int highScore = 0;
 
+
     private final Canvas canvas = new Canvas(WIDTH, HEIGHT);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -47,8 +48,8 @@ public class Game extends Pane {
     private final long BOOM_DURATION = 1_000_000_000;
 
     /* ---------- ROAD SCROLLING ---------- */
-    private double roadY1 = 0;
-    private double roadY2 = -HEIGHT;
+    private final int TOTAL_ROADS = 5;
+    private double[] roadY = new double[TOTAL_ROADS];
     private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
@@ -63,6 +64,10 @@ public class Game extends Pane {
     public Game() {
         getChildren().add(canvas);
         this.highScore = loadHighScore();
+
+        for (int i = 0; i < TOTAL_ROADS; i++) {
+            roadY[i] = -i * HEIGHT;
+        }
     }
 
     /* ---------- CONTROLS ---------- */
@@ -128,13 +133,14 @@ public class Game extends Pane {
 
     /* ---------- ROAD ---------- */
     private void updateRoad() {
-        roadY1 += ROAD_SPEED;
-        roadY2 += ROAD_SPEED;
+        for (int i = 0; i < TOTAL_ROADS; i++) {
+            roadY[i] += ROAD_SPEED;
 
-        if (roadY1 >= HEIGHT)
-            roadY1 = -HEIGHT;
-        if (roadY2 >= HEIGHT)
-            roadY2 = -HEIGHT;
+            if (roadY[i] >= HEIGHT) {
+                int topIndex = (i == 0) ? TOTAL_ROADS - 1 : i - 1;
+                roadY[i] = roadY[topIndex] - (HEIGHT - 3);
+            }
+        }
     }
 
     /* ---------- ENEMIES ---------- */
@@ -163,9 +169,16 @@ public class Game extends Pane {
             return;
         if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN)
             return;
+        if (gameOver || showBoom)
+            return;
+        if (enemies.size() > 4 || now - lastSpawnTime < SPAWN_COOLDOWN)
+            return;
 
         double lane = LANES[random.nextInt(LANES.length)];
+        double lane = LANES[random.nextInt(LANES.length)];
 
+        boolean laneBusy = false;
+        for (RandomCar enemy : enemies) {
         boolean laneBusy = false;
         for (RandomCar enemy : enemies) {
 
@@ -183,7 +196,13 @@ public class Game extends Pane {
         if (!laneBusy) {
             String side = random.nextBoolean() ? "car_left" : "car_right";
             String image = side + (random.nextInt(3) + 1) + ".png";
+        if (!laneBusy) {
+            String side = random.nextBoolean() ? "car_left" : "car_right";
+            String image = side + (random.nextInt(3) + 1) + ".png";
 
+            enemies.add(new RandomCar(lane, image, currentEnemySpeed));
+            lastSpawnTime = now;
+        }
             enemies.add(new RandomCar(lane, image, currentEnemySpeed));
             lastSpawnTime = now;
         }
@@ -246,8 +265,9 @@ public class Game extends Pane {
         gc.fillRect(0, 0, WIDTH, HEIGHT);
 
         // Road
-        gc.drawImage(Assets.img("road1.png"), 0, roadY1, WIDTH, HEIGHT);
-        gc.drawImage(Assets.img("road2.png"), 0, roadY2, WIDTH, HEIGHT);
+        for (int i = 0; i < TOTAL_ROADS; i++) {
+            gc.drawImage(Assets.img("road" + (i + 1) + ".png"), 0, roadY[i], WIDTH, HEIGHT);
+        }
 
         // Cars
         player.draw(gc);
@@ -257,10 +277,8 @@ public class Game extends Pane {
             double boomHeight = 75; // desired height
             gc.drawImage(Assets.img("boom.png"), boomX, boomY, boomWidth, boomHeight);
         }
-
         // HUD
         gc.setFill(Color.WHITE);
-
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         gc.fillText("Score: " + score, 20, 30);
         gc.fillText("HighScore: " + highScore, 20, 50);
