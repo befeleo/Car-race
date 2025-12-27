@@ -1,0 +1,35 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse / IntelliJ / VS Code
+*.iml
+.idea/
+.vscode/
+*.ipr
+*.iws
+*.class
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Java
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# JavaFX specific
+# (sometimes you may have downloaded JavaFX libs manually)
+lib/
+
+# Test results
+surefire-reports/
