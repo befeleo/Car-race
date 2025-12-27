@@ -23,6 +23,11 @@ public class Game extends Pane {
     private final List<RandomCar> enemies = new ArrayList<>();
     private final Random random = new Random();
 
+    private long lastSpawnTime = 0;
+    private static final long SPAWN_COOLDOWN = 1_500_000_000L; 
+    private double currentEnemySpeed = 3.0;
+    private static final double SPEED_INCREMENT = 0.4; 
+
     private boolean gameOver = false;
     private int score = 0;
 private boolean showBoom = false;
@@ -35,7 +40,7 @@ private final long BOOM_DURATION = 1_000_000_000;
     private static double ROAD_SPEED = 2;
 
     /* ---------- LANES ---------- */
-    private static final double[] LANES = {130, 185, 250, 300};
+    private static final double[] LANES = { 130, 185, 250, 300 };
 
     public Game() {
         getChildren().add(canvas);
@@ -75,7 +80,8 @@ private final long BOOM_DURATION = 1_000_000_000;
 
             @Override
             public void handle(long now) {
-                if (gameOver) return;
+                if (gameOver)
+                    return;
 
                 updateRoad();
                 player.update();
@@ -93,8 +99,10 @@ private final long BOOM_DURATION = 1_000_000_000;
         roadY1 += ROAD_SPEED;
         roadY2 += ROAD_SPEED;
 
-        if (roadY1 >= HEIGHT) roadY1 = -HEIGHT;
-        if (roadY2 >= HEIGHT) roadY2 = -HEIGHT;
+        if (roadY1 >= HEIGHT)
+            roadY1 = -HEIGHT;
+        if (roadY2 >= HEIGHT)
+            roadY2 = -HEIGHT;
     }
 
     /* ---------- ENEMIES ---------- */
@@ -104,6 +112,11 @@ private final long BOOM_DURATION = 1_000_000_000;
         enemies.removeIf(e -> {
             if (e.y > HEIGHT + 100) {
                 score++;
+
+                if (currentEnemySpeed < 10.0) {
+                    currentEnemySpeed += SPEED_INCREMENT;
+                }
+
                 return true;
             }
             return false;
@@ -112,22 +125,26 @@ private final long BOOM_DURATION = 1_000_000_000;
 
     private void spawnEnemies(long now) {
         if (gameOver || showBoom) return; 
-        if (now % 1_000_000_000 < 20_000_000 && enemies.size() < 4) {
+        if (now - lastSpawnTime >= SPAWN_COOLDOWN && enemies.size() < 4) {
 
             double lane = LANES[random.nextInt(LANES.length)];
 
-            String image =
-                    random.nextBoolean()
-                            ? "car_left" + (random.nextInt(3) + 1) + ".png"
-                            : "car_right" + (random.nextInt(3) + 1) + ".png";
+            boolean laneBusy = false;
+            for (RandomCar enemy : enemies) {
+                
+                if (Math.abs(enemy.x - lane) < 10 && enemy.y < 200) {
+                    laneBusy = true;
+                    break;
+                }
+            }
 
-            enemies.add(
-                    new RandomCar(
-                            lane,
-                            image,
-                            2 + random.nextInt(2)
-                    )
-            );
+            if (!laneBusy) {
+                String side = random.nextBoolean() ? "car_left" : "car_right";
+                String image = side + (random.nextInt(3) + 1) + ".png";
+
+                enemies.add(new RandomCar(lane, image, currentEnemySpeed));
+                lastSpawnTime = now;
+            }
         }
     }
 

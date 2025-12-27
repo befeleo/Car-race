@@ -3,17 +3,15 @@ package com.autonest;
 public class RandomCar extends Car {
 
     public RandomCar(double laneX, String imageName, double speed) {
-        super(
-                laneX,
-                -120, // start above screen
-                50,
-                90,
-                speed,
-                Assets.img(imageName));
+        super(laneX, -120, 50, 90, speed, Assets.img(imageName));
     }
 
     @Override
     public void update() {
-        y += speed; // move DOWN toward player
+        // If speed is somehow 0, force it to at least move slowly
+        if (this.speed <= 0)
+            this.speed = 2.0;
+
+        this.y += this.speed;
     }
 }
