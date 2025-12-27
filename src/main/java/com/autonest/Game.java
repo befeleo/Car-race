@@ -25,6 +25,8 @@ public class Game extends Pane {
 
     private boolean gameOver = false;
     private int score = 0;
+private boolean showBoom = false;
+private double boomX, boomY;
 
     /* ---------- ROAD SCROLLING ---------- */
     private double roadY1 = 0;
@@ -120,15 +122,21 @@ public class Game extends Pane {
     }
 
     /* ---------- COLLISION ---------- */
-    private void checkCollision() {
-        for (RandomCar enemy : enemies) {
-            if (player.collidesWith(enemy)) {
-                gameOver = true;
-            }
+private void checkCollision() {
+    for (RandomCar enemy : enemies) {
+        if (player.collidesWith(enemy)) {
+            gameOver = true;
+
+            // Store collision point for explosion
+            boomX = player.getCollisionX(enemy) - 25; // adjust half of explosion width
+            boomY = player.getCollisionY(enemy) - 25;
+            showBoom = true;
+            break;
         }
     }
+}
 
-    /* ---------- RENDER ---------- */
+  /* ---------- RENDER ---------- */
     private void render() {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
@@ -140,6 +148,12 @@ public class Game extends Pane {
         // Cars
         player.draw(gc);
         enemies.forEach(e -> e.draw(gc));
+if (showBoom) {
+    double boomWidth = 75;  // desired width
+    double boomHeight = 75; // desired height
+    gc.drawImage(Assets.img("boom.png"), boomX, boomY, boomWidth, boomHeight);
+}
+
 
         // HUD
         gc.setFill(Color.WHITE);
