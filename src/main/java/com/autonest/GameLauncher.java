@@ -13,7 +13,7 @@ public class GameLauncher extends Application {
 
     private Stage primaryStage;
     private int highScore = 20;
-    private int currentScore = 14;
+    private int currentScore = 23;
 
     @Override
     public void start(Stage primaryStage) {
@@ -51,7 +51,10 @@ public class GameLauncher extends Application {
 
     public void showGameOverScreen() {
 
-        boolean isHighScore = false;
+        if (currentScore > highScore)
+            highScore = currentScore;
+
+        boolean isHighScore = currentScore == highScore && currentScore > 0;
 
         Label gameOverLabel = new Label("GAME OVER");
         gameOverLabel.setId("gameover-title");
@@ -62,12 +65,6 @@ public class GameLauncher extends Application {
         Label highScoreLabel = new Label("High Score: " + highScore);
         highScoreLabel.setId("score-label");
 
-        Label newHighScoreLabel = null;
-        if (isHighScore) {
-            newHighScoreLabel = new Label("NEW HIGH SCORE!");
-            newHighScoreLabel.setId("score-label");
-        }
-
         Button restartButton = new Button("RESTART");
         restartButton.setId("restart-button");
 
@@ -77,29 +74,26 @@ public class GameLauncher extends Application {
         restartButton.setOnAction(e -> showWelcomeScreen());
         exitButton.setOnAction(e -> System.exit(0));
 
-        VBox layout = new VBox(30);
+        VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(50));
+        layout.setPadding(new Insets(40));
         layout.setId("gameover-layout");
 
         layout.getChildren().add(gameOverLabel);
 
-        if (newHighScoreLabel != null) {
+        if (isHighScore) {
+            Label newHighScoreLabel = new Label("NEW HIGH SCORE!");
+            newHighScoreLabel.setId("score-label");
+            newHighScoreLabel.setId("highscore-celebration");
             layout.getChildren().add(newHighScoreLabel);
         }
 
-        layout.getChildren().add(scoreLabel);
-        layout.getChildren().add(highScoreLabel);
-        layout.getChildren().addAll(restartButton, exitButton);
+        layout.getChildren().addAll(scoreLabel, highScoreLabel, restartButton, exitButton);
 
         Scene scene = new Scene(layout, 700, 500);
         scene.getStylesheets().add(getClass().getResource("css/gameover.css").toExternalForm());
 
-        if (isHighScore) {
-            primaryStage.setTitle("Car Racing Game - NEW HIGH SCORE!");
-        } else {
-            primaryStage.setTitle("Car Racing Game - Game Over");
-        }
+        primaryStage.setTitle(isHighScore ? "Car Racing Game - NEW HIGH SCORE!" : "Car Racing Game - Game Over");
         primaryStage.setScene(scene);
     }
 
