@@ -1,4 +1,3 @@
-/* Game Over Screen Styling */
 #gameover-layout {
   -fx-background-color: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
 }
@@ -30,6 +29,7 @@
   -fx-padding: 15 40;
   -fx-border-radius: 25;
   -fx-cursor: hand;
+  cursor: hand;
 }
 
 #restart-button:hover {
@@ -48,6 +48,7 @@
   -fx-padding: 15 40;
   -fx-border-radius: 25;
   -fx-cursor: hand;
+  cursor: hand;
 }
 
 #gameover-exit-button:hover {
