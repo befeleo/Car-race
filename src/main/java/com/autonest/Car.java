@@ -1,13 +1,16 @@
 package com.autonest;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+
 public abstract class Car {
 
     protected double x, y;
     protected double width, height;
     protected double speed;
-    protected javafx.scene.image.Image sprite;
+    protected Image sprite;
 
-    public Car(double x, double y, double width, double height, double speed, javafx.scene.image.Image sprite) {
+    public Car(double x, double y, double width, double height, double speed, Image sprite) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -16,15 +19,13 @@ public abstract class Car {
         this.sprite = sprite;
     }
 
-    public void draw(javafx.scene.canvas.GraphicsContext gc) {
-        gc.drawImage(sprite, x, y, width, height);
+    public void draw(GraphicsContext draw) {
+        draw.drawImage(sprite, x, y, width, height);
     }
 
     public abstract void update();
 
-    // 🔹 Precise collision using smaller hitbox
     public boolean collidesWith(Car other) {
-        // hitbox is smaller than full image (adjust 10% from sides)
         double paddingX = width * 0.1;
         double paddingY = height * 0.1;
 
@@ -39,12 +40,11 @@ public abstract class Car {
         double otherBottom = other.y + other.height - paddingY;
 
         return thisLeft < otherRight &&
-               thisRight > otherLeft &&
-               thisTop < otherBottom &&
-               thisBottom > otherTop;
+                thisRight > otherLeft &&
+                thisTop < otherBottom &&
+                thisBottom > otherTop;
     }
 
-    // 🔹 Exact collision point (center of overlapping area)
     public double getCollisionX(Car other) {
         double left = Math.max(x, other.x);
         double right = Math.min(x + width, other.x + other.width);
@@ -57,8 +57,19 @@ public abstract class Car {
         return ((top + bottom) / 2);
     }
 
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getWidth() { return width; }
-    public double getHeight() { return height; }
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
 }

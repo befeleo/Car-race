@@ -18,6 +18,7 @@
   -fx-padding: 15 40;
   -fx-border-radius: 25;
   -fx-cursor: hand;
+  cursor: hand;
 }
 
 #start-button:hover {
@@ -31,15 +32,16 @@
   -fx-font-size: 20px;
   -fx-font-weight: bold;
   -fx-text-fill: white;
- -fx-background-color: linear-gradient(to bottom, #ff0000, #ff7e5f);
+  -fx-background-color: linear-gradient(to bottom, #ff0000, #ff7e5f);
   -fx-background-radius: 25;
   -fx-padding: 15 40;
   -fx-border-radius: 25;
   -fx-cursor: hand;
+  cursor: hand;
 }
 
 #exit-button:hover {
- -fx-background-color: linear-gradient(to bottom, #ff7e5f, #ff0000); 
+  -fx-background-color: linear-gradient(to bottom, #ff7e5f, #ff0000);
   -fx-scale-x: 1.05;
   -fx-scale-y: 1.05;
 }

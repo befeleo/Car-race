@@ -44,22 +44,20 @@ public class Game extends Pane {
     private boolean showBoom = false;
     private double boomX, boomY;
     private long boomStartTime = 0;
-    private final long BOOM_DURATION = 1_000_000_000;
+    private final long BOOM_DURATION = 1_000_000_000L;
 
-    /* ---------- ROAD SCROLLING ---------- */
     private final int TOTAL_ROADS = 5;
     private double[] roadY = new double[TOTAL_ROADS];
     private static double ROAD_SPEED = 3;
 
-    /* ---------- LANES ---------- */
     private static final double[] LANES = {
             190, 240, 290, 340, 390, 440
     };
 
-    private double controlminSpeed = 4; // EASY
-    private double controlMidSpeed = 5; // Medium
-    private double controlMaxSpeed = 6; // Hard
-    private double controlExtraSpeed = 8; // Too Hard
+    private double controlEasySpeed = 4;
+    private double controlMediumSpeed = 5;
+    private double controlHardSpeed = 6;
+    private double controlExtremeSpeed = 8;
 
     public Game() {
         getChildren().add(canvas);
@@ -70,17 +68,17 @@ public class Game extends Pane {
         }
     }
 
-    /* ---------- CONTROLS ---------- */
     public void bindControls(Scene scene) {
 
         double controlSpeed;
         if (score > 35)
-            controlSpeed = controlExtraSpeed;
+            controlSpeed = controlExtremeSpeed;
         else if (score > 25)
-            controlSpeed = controlMaxSpeed;
+            controlSpeed = controlHardSpeed;
         else if (score > 15)
-            controlSpeed = controlMidSpeed;
-        else controlSpeed = controlminSpeed;
+            controlSpeed = controlMediumSpeed;
+        else
+            controlSpeed = controlEasySpeed;
 
         scene.setOnKeyPressed(e -> {
             if (gameOver || showBoom)
@@ -102,17 +100,16 @@ public class Game extends Pane {
         });
     }
 
-    /* ---------- GAME LOOP ---------- */
     public void startGame() {
-        // Reset game state
+
         gameOver = false;
         showBoom = false;
-        ROAD_SPEED = 2; // reset road speed
+        ROAD_SPEED = 2;
         player.speedX = 0;
         player.speedY = 0;
         lastSpawnTime = 0;
         SPAWN_COOLDOWN = 1_500_000_000L;
-        enemies.forEach(e -> e.speed = 2); // reset existing enemies' speed
+        enemies.forEach(e -> e.speed = 2);
 
         new AnimationTimer() {
 
@@ -132,7 +129,6 @@ public class Game extends Pane {
         }.start();
     }
 
-    /* ---------- ROAD ---------- */
     private void updateRoad() {
         for (int i = 0; i < TOTAL_ROADS; i++) {
             roadY[i] += ROAD_SPEED;
@@ -144,7 +140,6 @@ public class Game extends Pane {
         }
     }
 
-    /* ---------- ENEMIES ---------- */
     private void updateEnemies() {
         if (showBoom || gameOver)
             return;
@@ -176,13 +171,11 @@ public class Game extends Pane {
         boolean laneBusy = false;
         for (RandomCar enemy : enemies) {
 
-            // 1️⃣ same lane too close
             if (Math.abs(enemy.x - lane) < 10 && enemy.y < SAFE_SPAWN_Y) {
                 laneBusy = true;
                 break;
             }
 
-            // 2️⃣ ANY lane too close vertically (fairness rule)
             if (enemy.y < 120) {
                 laneBusy = true;
                 break;
@@ -198,11 +191,10 @@ public class Game extends Pane {
 
     }
 
-    /* ---------- COLLISION ---------- */
     private void checkCollision() {
         for (RandomCar enemy : enemies) {
             if (player.collidesWith(enemy) && !showBoom) {
-                boomX = player.getCollisionX(enemy) - 37; // center explosion
+                boomX = player.getCollisionX(enemy) - 37;
                 boomY = player.getCollisionY(enemy) - 37;
                 showBoom = true;
                 boomStartTime = System.nanoTime();
@@ -219,7 +211,6 @@ public class Game extends Pane {
             saveHighScore(highScore);
         }
 
-        // After 1 second of showing boom, end game
         if (showBoom && System.nanoTime() - boomStartTime > BOOM_DURATION) {
             gameOver = true;
         }
@@ -237,7 +228,7 @@ public class Game extends Pane {
     private int loadHighScore() {
         File file = new File(HIGHSCORE_FILE);
         if (!file.exists())
-            return 0; // No file? Score is 0.
+            return 0;
 
         try (Scanner scanner = new Scanner(file)) {
             if (scanner.hasNextInt()) {
@@ -249,25 +240,23 @@ public class Game extends Pane {
         return 0;
     }
 
-    /* ---------- RENDER ---------- */
     private void render() {
+
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-        // Road
         for (int i = 0; i < TOTAL_ROADS; i++) {
             gc.drawImage(Assets.img("road" + (i + 1) + ".png"), 0, roadY[i], WIDTH, HEIGHT);
         }
 
-        // Cars
         player.draw(gc);
         enemies.forEach(e -> e.draw(gc));
+
         if (showBoom) {
-            double boomWidth = 75; // desired width
-            double boomHeight = 75; // desired height
+            double boomWidth = 75;
+            double boomHeight = 75;
             gc.drawImage(Assets.img("boom.png"), boomX, boomY, boomWidth, boomHeight);
         }
-        // HUD
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         gc.fillText("Score: " + score, 20, 30);
@@ -278,7 +267,6 @@ public class Game extends Pane {
         return gameOver;
     }
 
-    /* ---------- GETTERS ---------- */
     public PlayerCar getPlayerCar() {
         return player;
     }

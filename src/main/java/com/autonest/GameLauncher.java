@@ -21,7 +21,6 @@ public class GameLauncher extends Application {
         showWelcomeScreen();
     }
 
-    // 🔹 Welcome Screen
     private void showWelcomeScreen() {
 
         Label titleLabel = new Label("Welcome to Car Racing Game");
@@ -49,7 +48,6 @@ public class GameLauncher extends Application {
         primaryStage.show();
     }
 
-    // 🔹 Start Game
     private void startGame() {
         Game Game = new Game();
         Scene gameScene = new Scene(Game, 700, 700);
@@ -58,10 +56,8 @@ public class GameLauncher extends Application {
         primaryStage.setScene(gameScene);
         primaryStage.setTitle("Car Racing Game");
 
-        // Start game loop
         Game.startGame();
 
-        // Detect game over
         new Thread(() -> {
             while (!Game.isGameOver()) {
                 try {
@@ -70,13 +66,12 @@ public class GameLauncher extends Application {
                 }
             }
 
-            PauseTransition pause = new PauseTransition(Duration.seconds(1)); // 1 second boom
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(ev -> showGameOverScreen(Game.getScore(), Game.getHighScore()));
             pause.play();
         }).start();
     }
 
-    // 🔹 Game Over Screen
     private void showGameOverScreen(int currentScore, int highScore) {
         if (currentScore > highScore)
             highScore = currentScore;
@@ -104,10 +99,11 @@ public class GameLauncher extends Application {
 
         Button restartButton = new Button("RESTART");
         restartButton.setId("restart-button");
-        restartButton.setOnAction(e -> startGame());
 
         Button exitButton = new Button("EXIT");
         exitButton.setId("gameover-exit-button");
+
+        restartButton.setOnAction(e -> startGame());
         exitButton.setOnAction(e -> System.exit(0));
 
         layout.getChildren().addAll(restartButton, exitButton);
